@@ -1,11 +1,7 @@
-<?
+<?php
 
 $WIN32=0;
 $openocd_cmd="";
-
-/* find out if we run on Linux/Windows*/
-if (strstr($_ENV["OS"], "Windows"))
-    $WIN32=1;
 
 if ($argc != 2){
     print_help_message();
@@ -40,9 +36,6 @@ if ($WIN32==1){
 }
 else
 {
-    if ($_ENV["USER"] != 'root')
-        die("You must run this as root\n");
-
     echo "\n ****	exec(modprobe ftdi_sio vendor=0x9e88 product=0x9e8f)";
     exec("modprobe ftdi_sio vendor=0x9e88 product=0x9e8f", $out, $rc);
 
