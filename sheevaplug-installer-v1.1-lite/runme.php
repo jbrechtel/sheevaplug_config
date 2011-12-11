@@ -109,7 +109,7 @@ if ($WIN32==1)
     echo " ****	When uboot.bin is written to NAND/SD, Disconnect and connect your mini USB cable\n";
 
 chdir("uboot");
-$openocd_cmd= "openocd/openocd";
+$openocd_cmd= "openocd";
 $openocd_cmd.= ($WIN32==1) ? ".exe" : "";
 $openocd_cmd.= " -f openocd/config/board/sheevaplug.cfg";
 $openocd_cmd.= " -s openocd/config/";
