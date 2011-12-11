@@ -1,0 +1,22 @@
+#### Change ONLY in the following few lines
+
+# Following for installation on SD card. If you want to boot from USB stick change it to /dev/sda1
+# or /dev/mtdblock1 if you installed rootfs on the NAND inside the plug
+bootargs_root ubi.mtd=1 root=ubi0:rootfs rootfstype=ubifs
+
+# NAND flash partitions. If using kernel >= 2.6.30 then replace orion_nand with orion_mtd
+mtdpartitions mtdparts=orion_nand:0x400000@0x100000(uImage),0x1fb00000@0x500000(rootfs)
+
+# The following is an example MAC address. Change it according the MAC on the back side of the plug
+ethaddr 00:50:43:01:c1:e6
+
+#### DONT change the following.
+# Automated process the sets arcNumer to 2097, reset, runs uImage and initrd from USB stick and set bootcmd to 'real_bootcmd' above
+# Bootcmd to be used after all installation is done
+real_bootcmd setenv bootargs $(bootargs_console) $(mtdpartitions) $(bootargs_root); nand read.e 0x00800000 0x00100000 0x00400000; bootm 0x00800000
+bootargs_console console=ttyS0,115200
+bootcmd run recover1
+recover1 setenv mainlineLinux yes; setenv arcNumber 2097; setenv bootcmd run recover2; saveenv; reset
+recover2 run recover3; setenv bootcmd $(real_bootcmd); saveenv; setenv bootargs $(bootargs_console) $(mtdpartitions) root=/dev/ram0 rw ramdisk=0x01100000,8M install_type=nand; bootm 0x00800000 0x01100000
+recover3 run recover4; nand erase clean 0x00100000 0x00400000; nand write.e 0x00800000 0x00100000 0x00400000
+recover4 usb start; fatload usb 0 0x00800000 uImage; fatload usb 0 0x01100000 initrd

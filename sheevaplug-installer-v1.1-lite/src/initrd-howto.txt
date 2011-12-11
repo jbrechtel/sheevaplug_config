@@ -1,0 +1,22 @@
+This is an installer initrd HOWTO
+=================================
+
+1) The directory includes an 8MB image of a basic file system in EXT2 format.
+   The filsystem includes: libuuid1-udeb_1.41.4-1ubuntu1_armel.udeb
+                           libblkid1-udeb_1.41.4-1ubuntu1_armel.udeb
+                           e2fsprogs-udeb_1.41.4-1ubuntu1_armel.udeb
+                           mtd-utils_20080508-1ubuntu1_armel.deb
+                           busybox_1.13.3-1_armel.deb
+2) create a initrd with 8MB size (COUNT=8192):
+	host > sudo dd if=/dev/zero of=/dev/ram0 bs=1k count=$COUNT
+	host > sudo mke2fs -vm0 /dev/ram0 $COUNT
+	host > sudo tune2fs -c 0 /dev/ram0
+	host > sudo dd if=/dev/ram0 bs=1k count=$COUNT | gzip -v9 > initrd.ext2.gz
+3) populate the initrd:
+	host > sudo mkdir mnt
+	host > sudo gunzip initrd.ext2.gz
+	host > sudo mount -o loop initrd.ext2 mnt/
+	host > ... copy stuff you want to have in initrd to mnt...
+	host > sudo umount mnt
+	host > sudo gzip -v9 initrd.ext2
+        host > sudo mkimage -A arm -O linux -T ramdisk -C gzip -a 0x00000000 -e 0x00000000 -n initrd.ext2.gz -d initrd.ext2.gz initrd

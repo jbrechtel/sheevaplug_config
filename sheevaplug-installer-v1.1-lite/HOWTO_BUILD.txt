@@ -1,0 +1,93 @@
+Sheevaplug installer environment README
+=======================================
+Intro -
+-------
+The following description should help you build the binaries in this installer.
+
+Please backup your data.
+
+The best place to get the up-to-date openOCD build description is @ plug wiki 
+ webpage:http://www.plugcomputer.org/plugwiki/index.php/Build_OpenOCD
+
+Installer parts -
+-----------------
+1. OpenOCD Linux -
+   a. Change to working directory (cd ~/work/)
+   b. Install libusb libraries: sudo aptitude install libusb-dev
+   c. Download libftdi library
+      1) Download the open source from http://www.intra2net.com/en/developer/libftdi/download.php 
+      2) Unpack it to your working directory (tar -czf libftdi-0.16.tar.gz)
+   d. Build libftdi library
+      1) Run the commands -
+         a) cd libftdi-0.16
+         b) ./configure --prefix=/usr
+         c) make
+         d) sudo make install
+   e. Download OpenOCD
+      1) Change to working directory (cd ~/work/)
+      2) Run the command -        svn checkout svn://svn.berlios.de/openocd/trunk trunk
+         If behind firewall try - svn checkout http://svn.berlios.de/svnroot/repos/openocd/trunk
+      3) Rename the openocd trunk directory (mv trunk openocd-<svn version>)
+   f. Build the OpenOCD
+      1) Change to working directory (cd ~/work/openocd-<version>)
+      2) Run the commands -
+         a) ./bootstrap
+         b)./configure --enable-ft2232_libftdi
+      3) Change in the main Makefile the SUBDIRS environment to disable document building: from SUBDIRS = src doc to SUBDIRS = src
+      4) Run the commands -
+         a) make
+         b) cd src
+         c) gcc -std=gnu99 -g -O2 -Wall -Wstrict-prototypes -Wformat-security -Wextra -Wno-unused-parameter -Wbad-function-cast -Wcast-align -Wredundant-decls -Werror -o openocd main.o  ./.libs/libopenocd.a -L/usr/lib -ldl /usr/lib/libftdi.a /usr/lib/libusb.a -static
+      5) You should have in the ~/work/openocd-<version>/src/ directory a binary named openocd.
+
+2. OpenOCD Windows -
+   a. Install Cygwin
+      1)install Cygwin from: http://www.cygwin.com/setup.exe
+      2)Select the install from internet
+      3)Use default installation path: c:\cygwin
+      4)Pick the Local Package Directory (this is the download cache directory)
+      5)Select Direct Connection
+      6)Select the mirror you want to use
+      7)In the package selection click on the Devel package (to install the development tools, you might not need all of them but I installed all of the just in case)
+      8)Install also the source for boost and boost-dev, make sure that the boost directory is in the /usr/include directory
+      9)When the installation ends click the Finish button
+   b. Create a Cygwin working directory; be sure not to place it in a path that includes spaces! (my example working path is C:\cygwin\work)
+   c. From this point on, references to directories are from within Cygwin console (note that paths differ between windows file browser and Cygwin console)
+   d. Build libftdi support to OpenOCD -
+      1) Download the latest driver for windows from http://www.intra2net.com/en/developer/libftdi/download/libftdi-0.16.tar.gz
+      2) Unpack the "libftdi-0.16.tar.gz" file into C:/cygwin/work/libftdi-0.16
+      3) Run the commands -
+         a) cd libftdi-0.16
+         b) ./configure --prefix=/usr
+         c) Remove from the Makefile "SUBDIRS = src bindings $(LIBFTDI_MODULES) examples doc" the "examples doc" text
+         d) make
+         e) sudo make install
+   e. Download OpenOCD
+      1) Open the Cygwin console (via the desktop shortcut or start menu) and change directory to the work directory we created ($ cd /cygdrive/c/work)
+      2) Run the command - svn checkout svn://svn.berlios.de/openocd/trunk trunk
+	 If behind firewall try - svn checkout http://svn.berlios.de/svnroot/repos/openocd/trunk
+         SVN version I am using in this readme is: 2356
+   f. Build the OpenOCD
+      1) Change to the OpenOCD directory (/cygdrive/c/cygwin/work/openopcd-2356)
+      2) Run the commands:
+         a) ./bootstrap
+         b) ./configure --enable-ft2232_libftdi --disable-werror
+         c) Change in the main Makefile the SUBDIRS environment to disable document building: from SUBDIRS = src doc to SUBDIRS = src
+         d) And run make
+         e) You should have in the cygdrive/c/cygwin/work/trunk/src/ directory a binary named openocd.exe.
+
+3. Executable PHP -
+   a. I used Bambalam PHP EXE Compiler/Embedder from - http://www.bambalam.se/bamcompile/
+
+4. uboot environment utility: fw_setenv
+   a. unpack src/uboot-envtools-20080520.tar.gz‎ and run: make
+
+Usefull links -
+---------------
+- http://plugcomputer.org/
+- http://www.plugcomputer.org/plugwiki/index.php/Build_OpenOCD
+- http://openocd.berlios.de/doc/html/Building-OpenOCD.html#Building-OpenOCD
+- http://www.intra2net.com/en/developer/libftdi/download/libftdi-0.16.tar.gz 
+- http://forum.sparkfun.com/viewtopic.php?t=11221&sid=580b1f736b58b03511319b58c8a033d0
+- http://www.ftdichip.com/Drivers/D2XX.htm 
+- http://www.cygwin.com/ 
